@@ -17,7 +17,7 @@ export const validateMessage = (message) => {
   if (message.length > CHAT_CONFIG.maxMessageLength) {
     return { 
       isValid: false, 
-      error: `Message too long (max ${CHAT_CONFIG.maxMessageLength} characters)` 
+      error: `Message is too long (maximum ${CHAT_CONFIG.maxMessageLength} characters)` 
     };
   }
   

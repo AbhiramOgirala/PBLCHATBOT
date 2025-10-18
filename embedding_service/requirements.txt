@@ -1,0 +1,6 @@
+flask==2.3.3
+sentence-transformers
+numpy
+torch --index-url https://download.pytorch.org/whl/cpu
+transformers
+tokenizers

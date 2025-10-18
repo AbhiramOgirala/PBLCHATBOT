@@ -1,13 +1,13 @@
 export const APP_CONFIG = {
   name: 'PBL Learning Assistant',
-  description: 'Your AI companion for Project-Based Learning',
+  description: 'AI-powered assistant for Project-Based Learning',
   version: '1.0.0'
 };
 
 export const CHAT_CONFIG = {
-  maxMessageLength: 1000,
+  maxMessageLength: 2000,
   typingDelay: 1000,
-  maxHistoryLength: 50
+  maxHistoryLength: 100
 };
 
 export const MESSAGE_TYPES = {

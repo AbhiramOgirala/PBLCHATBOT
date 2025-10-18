@@ -1,0 +1,1 @@
+- [x] Add Python-specific ignores to .gitignore (e.g., __pycache__/, *.pyc, *.pyo, *.pyd, .Python, env/, venv/, .env, .venv, pip-log.txt, pip-delete-this-directory.txt, .tox/, .coverage, .coverage.*, .cache, nosetests.xml, coverage.xml, *.cover, .hypothesis/, .pytest_cache/)

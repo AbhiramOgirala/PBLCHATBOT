@@ -4,7 +4,7 @@ const API_BASE_URL = '/api';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 30000, // 30 seconds
+  timeout: 30000,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -13,7 +13,7 @@ const api = axios.create({
 // Request interceptor
 api.interceptors.request.use(
   (config) => {
-    // Add auth token here if needed
+    console.log(`🔄 API Call: ${config.method?.toUpperCase()} ${config.url}`);
     return config;
   },
   (error) => {
@@ -23,19 +23,19 @@ api.interceptors.request.use(
 
 // Response interceptor
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    console.log('✅ API Response:', response.status);
+    return response;
+  },
   (error) => {
-    console.error('API Error:', error);
+    console.error('❌ API Error:', error.response?.data || error.message);
     
     if (error.response) {
-      // Server responded with error status
       const message = error.response.data?.error || 'Server error occurred';
       throw new Error(message);
     } else if (error.request) {
-      // Request made but no response received
       throw new Error('Network error. Please check your connection.');
     } else {
-      // Something else happened
       throw new Error('An unexpected error occurred.');
     }
   }

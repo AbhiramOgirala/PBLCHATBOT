@@ -9,7 +9,6 @@ export const useChat = () => {
   const { chatHistory, addMessage, clearHistory } = useChatHistory();
 
   const sendMessage = useCallback(async (message) => {
-    // Validate message
     const validation = validateMessage(message);
     if (!validation.isValid) {
       setError(validation.error);
@@ -20,7 +19,7 @@ export const useChat = () => {
     setIsLoading(true);
 
     try {
-      // Add user message to history immediately
+      // Add user message immediately
       const userMessage = {
         id: Date.now(),
         sender: 'user',
@@ -33,12 +32,13 @@ export const useChat = () => {
       // Send to API
       const response = await chatAPI.sendMessage(message, chatHistory);
       
-      // Add AI response to history
+      // Add AI response
       const aiMessage = {
         id: Date.now() + 1,
         sender: 'ai',
         message: response.response,
-        timestamp: response.timestamp
+        timestamp: response.timestamp,
+        hasContext: response.hasContext
       };
       
       addMessage(aiMessage);
@@ -50,7 +50,7 @@ export const useChat = () => {
       const errorMessage = {
         id: Date.now() + 1,
         sender: 'ai',
-        message: `Sorry, I encountered an error: ${err.message}. Please try again.`,
+        message: `I apologize, but I encountered an error: ${err.message}. Please try again in a moment.`,
         timestamp: new Date().toISOString(),
         isError: true
       };
