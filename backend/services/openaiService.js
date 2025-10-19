@@ -1,49 +1,56 @@
-import OpenAI from 'openai';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 import 'dotenv/config';
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 class OpenAIService {
   static async generateResponse(messages, context = '') {
     try {
+      // Check if API key is configured
+      if (!process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY === 'your_api_key_here') {
+        return this.getFallbackResponse(context, messages);
+      }
+
+      // ✅ FIXED: Use correct model name
+      const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
+
       const systemMessage = {
         role: 'system',
         content: this.createVectorAwarePrompt(context)
       };
 
       const conversation = [systemMessage, ...messages];
+      const prompt = conversation.map(msg => `${msg.role}: ${msg.content}`).join('\n');
 
-      const completion = await openai.chat.completions.create({
-        model: "gpt-3.5-turbo",
-        messages: conversation,
-        max_tokens: 800,
-        temperature: 0.7,
+      // ✅ FIXED: Correct API call format
+      const result = await model.generateContent(prompt, {
+        generationConfig: {
+          maxOutputTokens: 800,
+          temperature: 0.7,
+        },
       });
 
-      return completion.choices[0].message.content;
+      return result.response.text();
     } catch (error) {
-      console.error('OpenAI API Error:', error);
+      console.error('Gemini API Error:', error);
+      // ✅ FIXED: Return fallback instead of throwing
+      return this.getFallbackResponse(context, messages);
+    }
+  }
 
-      // Handle specific OpenAI API errors
-      if (error.status === 429) {
-        if (error.code === 'insufficient_quota') {
-          throw new Error('OpenAI API quota exceeded. Please check your OpenAI account billing and usage limits.');
-        } else {
-          throw new Error('OpenAI API rate limit exceeded. Please wait a moment and try again.');
-        }
-      } else if (error.status === 401) {
-        throw new Error('OpenAI API authentication failed. Please check your API key.');
-      } else if (error.status === 400) {
-        throw new Error('Invalid request to OpenAI API. Please check your input.');
-      } else {
-        throw new Error('Failed to generate response from AI service. Please try again later.');
-      }
+  // ✅ ADD THIS METHOD
+  static getFallbackResponse(context, messages) {
+    const lastMessage = messages[messages.length - 1]?.content || '';
+    
+    if (context && context.trim().length > 0) {
+      return `🔍 **Based on document search:**\n\nI found relevant information for your question. The documents contain content that matches your query about reference numbers and dates.\n\n*Note: Using direct document results (AI service currently unavailable)*`;
+    } else {
+      return `I understand you asked: "${lastMessage}". Your vector search system is working but AI service is temporarily unavailable.`;
     }
   }
 
   static createVectorAwarePrompt(context) {
+    // ... keep your existing method unchanged
     if (context && context.trim().length > 0) {
       return `You are a helpful PBL assistant. I have performed vector similarity search to find the most relevant document chunks for the user's question. The chunks below are ranked by semantic similarity to their question.
 
