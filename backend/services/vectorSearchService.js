@@ -1,7 +1,7 @@
 import supabase from '../config/supabaseClient.js';
 
 class VectorSearchService {
-  static async getRelevantContext(userQuestion, matchThreshold = 0.7, matchCount = 5) {
+  static async getRelevantContext(userQuestion, matchThreshold = 0.1, matchCount = 10) {
     try {
       console.log('🔍 PURE VECTOR SEARCH - Vectorizing user question:', userQuestion.substring(0, 100));
       

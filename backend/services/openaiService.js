@@ -25,7 +25,21 @@ class OpenAIService {
       return completion.choices[0].message.content;
     } catch (error) {
       console.error('OpenAI API Error:', error);
-      throw new Error('Failed to generate response from AI service');
+
+      // Handle specific OpenAI API errors
+      if (error.status === 429) {
+        if (error.code === 'insufficient_quota') {
+          throw new Error('OpenAI API quota exceeded. Please check your OpenAI account billing and usage limits.');
+        } else {
+          throw new Error('OpenAI API rate limit exceeded. Please wait a moment and try again.');
+        }
+      } else if (error.status === 401) {
+        throw new Error('OpenAI API authentication failed. Please check your API key.');
+      } else if (error.status === 400) {
+        throw new Error('Invalid request to OpenAI API. Please check your input.');
+      } else {
+        throw new Error('Failed to generate response from AI service. Please try again later.');
+      }
     }
   }
 
